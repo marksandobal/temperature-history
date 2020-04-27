@@ -2,26 +2,31 @@ namespace :temperature do
   desc "TODO"
   task get_temperature_task: :environment do
     cities = ['Monterrey']
-    ActiveRecord::Base.transaction do
-      
-      cities.each do |city|
-        response = make_request(city)
-        # get response_parsed and get data
-        temperature = ''
-        save_temperature(city, temperature)
 
+    ActiveRecord::Base.transaction do
+      cities.each do |city|
+        response = request_temperature_api(city)
+
+        if response[:success]
+          data = response[:response][:main]
+          save_temperature(data)
+        end
       rescue StandardError => e
-        puts e.messages
+        puts e.message
       end
     end
   end
 end
 
-def make_request(city)
-  api = TemperatureApi.new
-  api.make_request(city)
+def request_temperature_api(city)
+  api = TemperatureApi.new(city: city)
+  api.process_request
 end
 
-def save_temperature(city, temperature)
-  Temperature.create!(city: city, temperature: temperature, type: 'C°')
+def save_temperature(data)
+  Temperature.create!(
+    city: data[:city],
+    temperature: data[:temperature],
+    type_temperature: 'C°'
+  )
 end

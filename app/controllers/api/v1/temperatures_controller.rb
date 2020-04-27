@@ -11,9 +11,10 @@ class Api::V1::TemperaturesController < ApplicationController
   end
 
   def min_temperature
-    temperature = Temperature.all.min
+    temperature = Temperature.min_temperature
+ 
     render(
-      json: temperature,
+      json: temperature.first,
       serializer: Api::V1::TemperatureSerializer,
       status: :ok
     )

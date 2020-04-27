@@ -65,4 +65,16 @@ RSpec.describe Api::V1::TemperaturesController, type: :request do
       end
     end
   end
+
+  describe 'Get #min_temperature' do
+    let!(:temperature1) { create(:temperature, temperature: 1, created_at: DateTime.now) }
+    let!(:temperature2) { create(:temperature, temperature: 2, created_at: DateTime.now - 2.hours) }
+
+    it 'responds with array objects' do
+      get '/min_temperature'
+      result = JSON.parse(response.body)
+
+      expect(result['temperature']['id']).to eq(temperature1.id)
+    end
+  end
 end
